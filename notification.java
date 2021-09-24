@@ -31,7 +31,7 @@ import androidx.core.app.NotificationCompat.WearableExtender;
 
 import com.example.myapplication.databinding.ActivityMainBinding;
 
-
+//
 public class MainActivity extends Activity {
 
     private ActivityMainBinding binding;
