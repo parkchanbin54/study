@@ -26,11 +26,7 @@ import com.google.android.gms.wearable.Wearable;
 import java.util.ArrayList;
 
 public class MyActivity extends Activity implements View.OnClickListener {
-    /**
-     * Wear-Keyboard, Activity-Based Keyboard for Android Wear.
-     * Built by Ido Ideas, 2014.
-     * This code is Open Source and free to use.
-     */
+    
     private static final String TAG = "MyActivity";
     public String datapath = "/data_path";
 
