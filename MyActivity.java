@@ -24,7 +24,6 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
-//
 public class MyActivity extends Activity implements View.OnClickListener {
     
     private static final String TAG = "MyActivity";
