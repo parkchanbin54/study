@@ -34,7 +34,7 @@ public class AES256 {
 
     }
 
-    //AES decoding
+    //AES decoding 
     public static String AES_Decode(String str) throws java.io.UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
         byte[] textBytes= Base64.decode(str,0);
         AlgorithmParameterSpec ivSpec=new IvParameterSpec(ivBytes);
