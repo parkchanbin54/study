@@ -3,7 +3,7 @@
 
 
   
-
+  
 def solution(array,commands):
     answer=[]
     for k in range (len(commands)):
