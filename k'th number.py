@@ -2,7 +2,7 @@
 # coding: utf-8
 
 
-  
+    
   
 def solution(array,commands):
     answer=[]
