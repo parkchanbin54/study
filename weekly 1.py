@@ -11,7 +11,7 @@ def solution(price, money, count):
         return -1;
     if count<1 or count>2500:
         return -1;
-    
+      
     tmptotal=0;
     while count>0:
         tmptotal+=price*count;
