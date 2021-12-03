@@ -20,7 +20,7 @@ public class InfoActivity extends AppCompatActivity {
         EditText phone2 = findViewById(R.id.phone2);
 
         back.setOnClickListener(new View.OnClickListener(){
-            @Override
+            @Override  
             public void onClick(View v)
             {
                 Intent intent=new Intent();
