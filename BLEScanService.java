@@ -45,7 +45,7 @@ public class BLEScanService extends Service {
     private Timer timer;
     private TimerTask timerTask;
     private int timerSecond;
-    private int closeSecond;
+    private int closeSecond;   
 
     // Target we publish for clients to send messages to IncomingHandler.
     private Messenger incomingMessenger = new Messenger(new IncomingHandler(Constants.HANDLER_TYPE_SERVICE, BLEScanService.this));
