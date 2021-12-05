@@ -66,7 +66,7 @@ public class BLEScanService extends Service {
         mBLEServiceUtils.createBluetoothAdapter(getSystemService(this.BLUETOOTH_SERVICE)); // Bluetooth Adapter 생성
         mBLEServiceUtils.enableBluetooth(); // Bluetooth 사용
 
-        if (mBLEServiceUtils.mBluetoothAdapter != null) { // Bluetooth를 사용 가능한 기기일 때
+        if (mBLEServiceUtils.mBluetoothAdapter != null) { 
             // waiting for stating bluetooth on
             try {
                 do {
