@@ -63,8 +63,8 @@ public class BLEScanService extends Service {
         isConnectedMessenger = false;
         isScanning = false;
 
-        mBLEServiceUtils.createBluetoothAdapter(getSystemService(this.BLUETOOTH_SERVICE)); // Bluetooth Adapter 생성
-        mBLEServiceUtils.enableBluetooth(); // Bluetooth 사용
+        mBLEServiceUtils.createBluetoothAdapter(getSystemService(this.BLUETOOTH_SERVICE));
+        mBLEServiceUtils.enableBluetooth();
 
         if (mBLEServiceUtils.mBluetoothAdapter != null) { 
             // waiting for stating bluetooth on
