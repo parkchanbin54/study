@@ -18,7 +18,7 @@ public class InfoActivity extends AppCompatActivity {
         Button back=findViewById(R.id.back);
         EditText url22 = findViewById(R.id.url2);
         EditText phone2 = findViewById(R.id.phone2);
-
+ 
         back.setOnClickListener(new View.OnClickListener(){
             @Override  
             public void onClick(View v)
