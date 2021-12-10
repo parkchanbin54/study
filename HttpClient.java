@@ -14,7 +14,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;  
 
 enum BinaryState {
     ON,
