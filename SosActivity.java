@@ -1,5 +1,5 @@
 package com.example.android.wearable.watchface.watchface;
-  
+    
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;  
