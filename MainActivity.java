@@ -1,138 +1,132 @@
-package edu.nd.ble_adv;
+package com.example.myapplication;
+
+import android.os.Handler;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseData;
-import android.bluetooth.le.AdvertiseSettings;
-import android.bluetooth.le.BluetoothLeAdvertiser;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.ParcelUuid;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-  
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
+import java.io.IOException;
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
-    /** Debug Tag **/
-    private static final String TAG = MainActivity.class.getSimpleName();
+    Button connect_btn; // ip 받아오는 버튼
 
-    /** UUID Declaration **/
-    public static final ParcelUuid UserID_UUID = ParcelUuid.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    EditText ip_edit; // ip 에디트
+    TextView show_text; // 서버에서온거 보여주는 에디트
+    // 소켓통신에 필요한것
+    private String html = "";
+    private Handler mHandler;
 
-    /** BLE Declaration **/
-    private BluetoothManager mBluetoothManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
+    private Socket socket;
+    private WebView mWebView;
+    private WebSettings mWebSettings;
+    private DataOutputStream dos;
+    private DataInputStream dis;
 
-    /** layout Variables Declaration **/
-    private EditText mEdit;
-    private Button Start_Adv;
-    private Button Stop_Adv;
-
-    private boolean BLE_status = FALSE;
+    private String ip = "192.168.0.9"; // IP 번호
+    private int port = 8080; // port 번호
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        WebView mWebView = (WebView) findViewById(R.id.webview);
 
-        /** Check BT Permission **/
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 1);
-        }
+        mWebView.setWebViewClient(new WebViewClient());
+        mWebSettings = mWebView.getSettings(); //각종 환경 설정 가능여부
+        mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 허용여부
+        mWebSettings.setSupportMultipleWindows(false); // 윈도우 여러개 사용여부
+        mWebSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN); // 컨텐츠사이즈 맞추기
+        mWebSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); // 캐시 허용 여부
+        mWebSettings.setUseWideViewPort(true); // wide viewport 사용 여부
+        mWebSettings.setSupportZoom(true); // Zoom사용여부
+        mWebSettings.setJavaScriptCanOpenWindowsAutomatically(false); // 자바스크립트가 window.open()사용할수있는지 여부
+        mWebSettings.setLoadWithOverviewMode(true); // 메타태그 허용 여부
+        mWebSettings.setBuiltInZoomControls(false); // 화면 확대 축소 허용 여부
+        mWebSettings.setDomStorageEnabled(true); // 로컬저장소 허용 여부
+        Button renew=findViewById(R.id.button);
+        connect();
+        renew.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("IN","HI");
+                mWebView.loadUrl("http://192.168.0.9:5000");
+            }
+        });
 
-        /** Set Click Listener for buttons **/
-        Start_Adv = (Button)findViewById(R.id.start_adv);
-        Start_Adv.setOnClickListener(Start_Adv_Listener);
-        Stop_Adv = (Button)findViewById(R.id.stop_adv);
-        Stop_Adv.setOnClickListener(Stop_Adv_Listener);
-        mEdit = (EditText)findViewById(R.id.editText);
-
-        /** BLE Settings **/
-        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
 
     }
 
-    /** Click Listener **/
-    private final View.OnClickListener Start_Adv_Listener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.v(TAG, String.valueOf(mEdit.getText().toString().length()));
-            if (mEdit.getText().toString().length() != 4){// validate the length of UserID
-                Toast.makeText(getApplicationContext(),"Invalid UserID!", Toast.LENGTH_SHORT).show();
-            }else{
-                if (BLE_status == FALSE){
-                    startAdvertising(mEdit.getText().toString().getBytes());
-                    Toast.makeText(getApplicationContext(),"BLE Advertising started!",Toast.LENGTH_SHORT).show();
-                    Log.e("hi",String.valueOf(mEdit.getText().toString().getBytes()));
-                }else{
-                    stopAdvertising();
-                    startAdvertising(mEdit.getText().toString().getBytes());
-                    Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
+
+
+
+
+    // 로그인 정보 db에 넣어주고 연결시켜야 함.
+    void connect(){
+        mHandler = new Handler();
+        Log.w("connect","연결 하는중");
+// 받아오는거
+        Thread checkUpdate = new Thread() {
+            public void run() {
+// ip받기
+                String newip = "192.168.0.9";
+
+// 서버 접속
+                try {
+                    socket = new Socket(newip, port);
+                    Log.w("서버 접속됨", "서버 접속됨");
+                } catch (IOException e1) {
+                    Log.w("서버접속못함", "서버접속못함");
+                    e1.printStackTrace();
+                }
+
+                Log.w("edit 넘어가야 할 값 : ","안드로이드에서 서버로 연결요청");
+
+                try {
+                    dos = new DataOutputStream(socket.getOutputStream()); // output에 보낼꺼 넣음
+                    dis = new DataInputStream(socket.getInputStream()); // input에 받을꺼 넣어짐
+                    dos.writeUTF("안드로이드에서 서버로 연결요청");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.w("버퍼", "버퍼생성 잘못됨");
+                }
+                Log.w("버퍼","버퍼생성 잘됨");
+
+// 서버에서 계속 받아옴 - 한번은 문자, 한번은 숫자를 읽음. 순서 맞춰줘야 함.
+                try {
+                    String line = "";
+                    int line2;
+                    while(true) {
+                        line = (String)dis.readUTF();
+                        line2 = (int)dis.read();
+                        Log.w("서버에서 받아온 값 :",""+line);
+                        Log.w("서버에서 받아온 값 ",""+line2);
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "STEALING", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }catch (Exception e){
+
                 }
             }
-        }
-    };
-
-    private final View.OnClickListener Stop_Adv_Listener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            stopAdvertising();
-        }
-    };
-
-    /** BLE Advertising **/
-    public void startAdvertising(byte[] payload){
-        mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-        if (mBluetoothLeAdvertiser == null) return;
-
-        AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY) //3 modes: LOW_POWER, BALANCED, LOW_LATENCY
-                .setConnectable(true)
-                .setTimeout(0)
-                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH) // ULTRA_LOW, LOW, MEDIUM, HIGH
-                .build();
-
-        AdvertiseData data = new AdvertiseData.Builder()
-                .setIncludeDeviceName(true)
-                .build();
-
-        mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
+        };
+// 소켓 접속 시도, 버퍼생성
+        checkUpdate.start();
     }
-
-
-    public void stopAdvertising() {
-        if (mBluetoothLeAdvertiser == null) return;
-        mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
-        Log.i(TAG, "LE Advertise Stopped.");
-        BLE_status = FALSE;
-    }
-
-    private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
-        @Override
-        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            Log.d("hihi:",settingsInEffect.toString());
-            Log.i(TAG, "LE Advertise Started.");
-            BLE_status = TRUE;
-        }
-        @Override
-        public void onStartFailure(int errorCode) {
-            Log.w(TAG, "LE Advertise Failed: " + errorCode);
-            BLE_status = FALSE;
-        }
-    };
-
 }
