@@ -1,4 +1,4 @@
- package com.example.myapplication;
+package com.example.android.wearable.watchface;
 
 import android.util.Base64;
 
@@ -22,7 +22,7 @@ public class AES256 {
     //AES encoding
 
     public static String AES_Encode(String str) throws java.io.UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
-  
+
         byte[] textBytes=str.getBytes("UTF-8");
         AlgorithmParameterSpec ivSpec=new IvParameterSpec(ivBytes);
         SecretKeySpec newKey= new SecretKeySpec(secretKey.getBytes("UTF-8"),"AES");
@@ -34,7 +34,7 @@ public class AES256 {
 
     }
 
-    //AES decoding 
+    //AES decoding
     public static String AES_Decode(String str) throws java.io.UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
         byte[] textBytes= Base64.decode(str,0);
         AlgorithmParameterSpec ivSpec=new IvParameterSpec(ivBytes);
